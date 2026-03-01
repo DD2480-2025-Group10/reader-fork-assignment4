@@ -516,9 +516,8 @@ def test_session_hook_unexpected_exception(
         reader.add_feed(url)
 
     exc = RuntimeError('error')
-
-    def hook(session, obj, *_, **__):
-        if '1' in obj.url:
+    def hook(obj):
+        if '1' in str(obj.url):
             raise exc
 
     getattr(reader._parser.session_factory, hook_name).append(hook)
