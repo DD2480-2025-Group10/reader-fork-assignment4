@@ -11,7 +11,9 @@ from typing import ContextManager
 from typing import IO
 
 import httpx
+import requests
 
+from .requests import _RequestsProxy
 from . import HTTPInfo
 from . import NotModified
 from . import RetrievedFeed
@@ -23,12 +25,16 @@ from ._http_utils import parse_options_header
 @dataclass(frozen=True)
 class HTTPRetriever:
     """http(s):// retriever that uses HTTPX.
-
+26	
+27	
     Roughly following feedparser's implementation[*]_,
+28	
     but currently keeps the same high-level return shape as before.
-
+29	
+30	
     .. [*] https://github.com/kurtmckee/feedparser/blob/6.0.10/feedparser/http.py
-
+31	
+32	
     """
 
     get_session: Callable[[], ContextManager[httpx.Client]]
@@ -40,6 +46,7 @@ class HTTPRetriever:
         caching_info: Any = None,
         accept: str | None = None,
     ) -> Iterator[RetrievedFeed[IO[bytes]]]:
+
         request_headers = {
             # https://tools.ietf.org/html/rfc3229#section-10.5.3
             # "Accept-Instance-Manipulation"
@@ -78,13 +85,22 @@ class HTTPRetriever:
                     raise NotModified(url, http_info=http_info)
 
                 error._message = "bad HTTP status code"
-                response.raise_for_status()
+                try:
+                    response.raise_for_status()
+                except httpx.HTTPStatusError as e:
+                    raise requests.HTTPError(
+                        str(e),
+                        response=_RequestsProxy(response),
+                    ) from e
 
                 content_type = headers.get("content-type")
                 if content_type:
                     mime_type, _ = parse_options_header(content_type)
                 else:
                     mime_type = None
+
+                if (not mime_type or mime_type == "text/plain") and url.endswith(".json"):
+                    mime_type = "application/json"
 
                 resource = io.BytesIO(response.content)
 

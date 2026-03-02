@@ -5,6 +5,7 @@ Requests utilities. Contains no business logic.
 
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable
 from collections.abc import Iterator
 from collections.abc import Mapping
@@ -19,8 +20,6 @@ from ..._utils import lazy_import
 
 
 if TYPE_CHECKING:  # pragma: no cover
-    import httpx
-
     from ._lazy import UAFallbackAuth as UAFallbackAuth
 
 
@@ -32,6 +31,49 @@ TimeoutType = Union[None, float, tuple[float, float], tuple[float, None]]
 CachingInfo = TypedDict('CachingInfo', {'etag': str, 'last-modified': str}, total=False)
 
 DEFAULT_TIMEOUT = (3.05, 60)
+
+
+class _RequestsProxy:
+    """
+    A shim layer providing attribute compatibility between HTTPX and Requests.
+
+    Attributes:
+        url (str): The string representation of the object's URL.
+    """
+    def __init__(self, obj):
+        self.__dict__['_obj'] = obj
+        self.__dict__['url'] = str(obj.url)
+
+    def __getattr__(self, name):
+        return getattr(self._obj, name)
+
+    def __setattr__(self, name, value):
+        self.__dict__[name] = value
+
+
+
+    @property
+    def request(self):
+        """
+        Return the request object associated with this response, wrapped in a proxy.
+        
+        Returns:
+            _RequestsProxy | None: The wrapped request or None if not present.
+        """
+        if hasattr(self._obj, 'request'):
+            return _RequestsProxy(self._obj.request)
+        return None
+
+def _wrap_hook(hook, client):
+    """Internal wrapper to handle 1-arg vs 2-arg hook signatures."""
+    def wrapper(obj):
+        sig = inspect.signature(hook)
+        params = [p for p in sig.parameters.values() 
+                  if p.kind in (p.POSITIONAL_OR_KEYWORD, p.POSITIONAL_ONLY)]
+        if len(params) == 1:
+            return hook(obj)
+        return hook(client, _RequestsProxy(obj))
+    return wrapper
 
 
 @dataclass
@@ -55,13 +97,14 @@ class SessionFactory:
 
     def __call__(self) -> httpx.Client:
         import httpx
+        	
 
         # httpx.Timeout can accept a tuple directly: (connect, read)
         # or all four parameters must be set explicitly
         if isinstance(self.timeout, tuple):
             timeout_obj = httpx.Timeout(
                 connect=self.timeout[0],
-                read=self.timeout[1],
+                read=self.timeout[1], 
                 write=None,
                 pool=None,
             )
@@ -73,18 +116,21 @@ class SessionFactory:
             headers['User-Agent'] = self.user_agent
         auth = self.custom_auth() if callable(self.custom_auth) else self.custom_auth
 
-        return httpx.Client(
+        client = httpx.Client(
             timeout=timeout_obj,
             headers=headers,
-            event_hooks={
-                'request': list(self.request_hooks),
-                # Response hooks kept for backward compatibility (tests)
-                # but ua_fallback now uses custom_auth instead
-                'response': list(self.response_hooks),
-            },
             auth=auth,
             follow_redirects=True,
         )
+
+        client.event_hooks = {
+            'request': [_wrap_hook(h, client) for h in self.request_hooks],
+            # Response hooks kept for backward compatibility (tests)
+            # but ua_fallback now uses custom_auth instead
+            'response': [_wrap_hook(h, client) for h in self.response_hooks],
+        }
+
+        return client
 
     @contextmanager
     def transient(self) -> Iterator[httpx.Client]:
@@ -97,6 +143,7 @@ class SessionFactory:
             contextmanager(httpx.Client):
 
         """
+
         if self.client:
             yield self.client
         else:

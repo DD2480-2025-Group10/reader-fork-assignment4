@@ -518,15 +518,10 @@ def test_session_hook_unexpected_exception(
 
     exc = RuntimeError('error')
 
-    def request_hook(request: httpx.Request):
-        if '1' in str(request.url):
-            raise exc
-        
-    def response_hook(response: httpx.Response):
-        if '1' in str(response.request.url):
+    def hook(session, obj, *_, **__):
+        if '1' in obj.url:
             raise exc
 
-    hook = request_hook if hook_name == 'request_hooks' else response_hook
     getattr(reader._parser.session_factory, hook_name).append(hook)
 
     rv = {int(r.url.rpartition('/')[2]): r for r in update_feeds_iter(reader)}
