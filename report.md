@@ -71,6 +71,8 @@ Overall results with link to a copy or excerpt of the logs (before/after
 refactoring).
 
 ## UML class diagram and its description
+!["Original"](img/new_old.png)
+In the original implementation, the reader parser relied on the requests library for all network operations. The SessionFactory was responsible for configuring a requests.Session with basic timeouts and headers. Any advanced logic, such as the ua_fallback plugin, was injected via global response hooks. This architecture was simple but lacked the flexibility to swap the underlying engine without breaking the expectations of the calling code, which depended on specific requests attributes like string-based URLs and specific exception types
 
 ### Key changes/classes affected
 
