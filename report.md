@@ -26,14 +26,14 @@ For each team member, how much time (**in hours**) was spent in:
 
 | Tasks | Villiam | William | Erik | Alrik | Boyan |
 |------|---------|---------|------|-------|-------|
-| 1. Plenary discussions/meetings | 5 | W | E | A | B |
-| 2. Discussions within parts of the group | 5 | W | E | A | B |
-| 3. Reading documentation | 1 | W | E | A | B |
-| 4. Configuration and setup | 1 | W | E | A | B |
-| 5. Analyzing code/output | 10 | W | E | A | B |
-| 6. Writing documentation | 2 | W | E | A | B |
-| 7. Writing code | 5 | W | E | A | B |
-| 8. Running code | 3 | W | E | A | B |
+| 1. Plenary discussions/meetings | 5 | 5 | E | 5 | B |
+| 2. Discussions within parts of the group | 5 | 3 | E | 3 | B |
+| 3. Reading documentation | 1 | 1 | E | 2 | B |
+| 4. Configuration and setup | 1 | 0.5 | E | 0.5 | B |
+| 5. Analyzing code/output | 10 | 4 | E | 5| B |
+| 6. Writing documentation | 2 | 3 | E | 2| B |
+| 7. Writing code | 5 | 3 | E | 5 | B |
+| 8. Running code | 3 | 2 | E | 3 | B |
 
 For setting up tools and libraries (step 4), enumerate all dependencies
 you took care of and where you spent your time, if that time exceeds
@@ -149,10 +149,10 @@ The practices and tools are being used by the whole team to perform their work. 
 
 All team members have access to the practices and tools required to do their work. ✅
 
-The whole team is involved in the inspection and adaptation of the way-of-working. ❌
+The whole team is involved in the inspection and adaptation of the way-of-working. ✅
 
 
-Based on the checklist in the Essence Standard v1.2, we asses our way of working as currently completing the In Use state and starting with the In Place state, having hit 1 milestone in the in place phase. We had some issues with using the same tools in this lab, but in the end we managed to sort it out.
+Based on the checklist in the Essence Standard v1.2, we assess our work as being in the In Place state, having hit 2 milestones in the in place phase. We had some issues with using the same tools in this lab, but in the end we managed to sort it out. Almost all practices and tools are being used by the whole team.
 
 
 ## Overall experience (NOT DONE)
@@ -160,8 +160,3 @@ Based on the checklist in the Essence Standard v1.2, we asses our way of working
 What are your main take-aways from this project? What did you learn?
 
 How did you grow as a team, using the Essence standard to evaluate yourself?
-
-
-Optional (point 6): How would you put your work in context with best software engineering practice?
-
-Optional (point 7): Is there something special you want to mention here?
