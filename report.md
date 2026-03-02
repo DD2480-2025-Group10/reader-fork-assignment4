@@ -26,14 +26,14 @@ For each team member, how much time (**in hours**) was spent in:
 
 | Tasks | Villiam | William | Erik | Alrik | Boyan |
 |------|---------|---------|------|-------|-------|
-| 1. Plenary discussions/meetings | 5 | 5 | E | 5 | B |
-| 2. Discussions within parts of the group | 5 | 3 | E | 3 | B |
-| 3. Reading documentation | 1 | 1 | E | 2 | B |
-| 4. Configuration and setup | 1 | 0.5 | E | 0.5 | B |
-| 5. Analyzing code/output | 10 | 4 | E | 5| B |
-| 6. Writing documentation | 2 | 3 | E | 2| B |
-| 7. Writing code | 5 | 3 | E | 5 | B |
-| 8. Running code | 3 | 2 | E | 3 | B |
+| 1. Plenary discussions/meetings | 5 | 5 | 5 | 5 | 5 |
+| 2. Discussions within parts of the group | 5 | 3 | E5| 3 | 5 |
+| 3. Reading documentation | 1 | 1 | 4 | 2 | 1 |
+| 4. Configuration and setup | 1 | 0.5 | 3 | 0.5 | 1 |
+| 5. Analyzing code/output | 10 | 4 | 5 | 5| 8 |
+| 6. Writing documentation | 2 | 3 | 5 | 2| 1 |
+| 7. Writing code | 5 | 3 | 5 | 5 | 10 |
+| 8. Running code | 3 | 2 | 2 | 3 | 2 |
 
 For setting up tools and libraries (step 4), enumerate all dependencies
 you took care of and where you spent your time, if that time exceeds
