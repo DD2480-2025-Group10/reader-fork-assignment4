@@ -12,13 +12,13 @@ URL: https://github.com/lemon24/reader
 
 ## Onboarding experience
 
-Did you choose a new project or continue on the previous one?
+> Did you choose a new project or continue on the previous one? If you changed the project, how did your experience differ from before?
 
-If you changed the project, how did your experience differ from before?
-
-We chose to work on a new project instead of `mypy` that we worked on in assignment 3. Compared to `mypy`, `reader`
+We choose to work on a new project instead of `mypy` that we worked on in assignment 3. Compared to `mypy`, `reader`
 did feel less complex and considerably more approachable based on the time we had to complete the assignment.
-The code is well structured, the issue we chose has a clear scope and had a stable test suite. Before choosing `reader`, we were thinking of working on `poke-env` (https://github.com/hsahovic/poke-env) but ultimately chose not to because (*ADD REASON WHY*)
+The code is well structured, the issue we chose has a somewhat clear scope and a stable test suite.
+Before choosing `reader`, we were working on `poke-env` (https://github.com/hsahovic/poke-env)
+but ultimately chose not to because that project required too much domain specific knowledge about the pokemon universe.
 
 ## Effort spent
 
@@ -26,14 +26,14 @@ For each team member, how much time (**in hours**) was spent in:
 
 | Tasks | Villiam | William | Erik | Alrik | Boyan |
 |------|---------|---------|------|-------|-------|
-| 1. Plenary discussions/meetings | V | W | E | A | B |
-| 2. Discussions within parts of the group | V | W | E | A | B |
-| 3. Reading documentation | V | W | E | A | B |
-| 4. Configuration and setup | V | W | E | A | B |
-| 5. Analyzing code/output | V | W | E | A | B |
-| 6. Writing documentation | V | W | E | A | B |
-| 7. Writing code | V | W | E | A | B |
-| 8. Running code | V | W | E | A | B |
+| 1. Plenary discussions/meetings | 5 | W | E | A | B |
+| 2. Discussions within parts of the group | 5 | W | E | A | B |
+| 3. Reading documentation | 1 | W | E | A | B |
+| 4. Configuration and setup | 1 | W | E | A | B |
+| 5. Analyzing code/output | 10 | W | E | A | B |
+| 6. Writing documentation | 2 | W | E | A | B |
+| 7. Writing code | 5 | W | E | A | B |
+| 8. Running code | 3 | W | E | A | B |
 
 For setting up tools and libraries (step 4), enumerate all dependencies
 you took care of and where you spent your time, if that time exceeds
@@ -47,28 +47,43 @@ URL: https://github.com/lemon24/reader/issues/360
 
 `reader` previously used **requests** for HTTP, but its lack of default timeouts and limited hook support had led to increasingly complex workarounds. This issue replaces it with **httpx**, a more modern alternative with built-in timeouts, cleaner request/response hooks, and future HTTP/2 support.
 
-Scope (functionality and code affected).
+### Scope (functionality and code affected).
 
-*TO BE ADDED*
+We found early that the requests library had already been abstracted into only two main classes. Our aim was to swap the implementation
+across these two classed by relpacing every instance of requests for httpx. Thereby we hoped to achive full backwards compatability with
+no changed interfaces or functionality affected.
+
+Where the functionality had not been abstracted, was mainly in the test suite. The test suite consistently choose to mock out requests
+from tests where the call was not emitted until 4-5 calls deep. This gave us a lot of trouble in debugging and fixing tests. Ultimately
+it was not totally possible to replace every single mock in the test suite, and we instead provided a small compatability shim that allows
+mocking out requests while actually mocking out the equivalent httpx call. This works but creates a large point of confusion in the tests
+since it still looks like requests is being used.
 
 ## Requirements for the new feature or requirements affected by functionality being refactored
+The following was our working requirements formulated from the original issue:
 
-Optional (point 3): trace tests to requirements.
+- [x] (1.0.0) Provide a POC implementation/replacement for current [HTTPRetriver](https://github.com/lemon24/reader/blob/54f89e04b71af86d1eba4f1a70931f895c09401f/src/reader/_parser/http.py#L24) using the [httpx](https://pypi.org/project/httpx/) library.
+  - [x] (1.1.0) Implement `__call__` function. Sends a request to some *url* and returns a `RetriverFeed`.
+    - [x] (1.1.1) Uses some equivalent of  [SessionWrapper](https://github.com/lemon24/reader/blob/3.14/src/reader/_parser/requests/_lazy.py#L45-L144)) to support caching requests.
+  - [x] (1.2.0) Implement `validate_url` function. Uses some notion of [prepared requests](https://tedboy.github.io/requests/adv3.html) to validate outgoing requests. **(Further details/explaination needed)**
+- [x] (2.0.0) Provide the same functionality provided by [SessionWrapper](https://github.com/lemon24/reader/blob/3.14/src/reader/_parser/requests/_lazy.py#L45-L144) either via new of native implementation.  **(Further details/explaination needed. May not be relevant)**
+  - [x] (2.1.0) Refactor SessionFactory to use httpx.Client with native timeout and event_hooks.
+  - [x] (2.2.0)Adapt ua_fallback plugin to use httpx response hook signature.
+- [x] (3.0.0) Interface must be backwards compatible. We are swapping out the implementation details of [requests](https://pypi.org/project/requests/) everything must work the same from the outside.
+- [x] (4.0.0) Wire implementation into the public interface **(HOW? tbd)**
 
 ## Code changes
 
 ### Patch
 
-[View diff on GitHub] - https://github.com/lemon24/reader/compare/master...DD2480-2025-Group10:reader-fork-assignment4:master
+The patch of changes can be viewed in our working pr: https://github.com/DD2480-2025-Group10/reader-fork-assignment4/pull/4
 
-Optional (point 4): the patch is clean.
-
-Optional (point 5): considered for acceptance (passes all automated checks).
+It should be noted that in the patch all previous tests are passing but the project has a hard 100% coverage requirement. We have
+digressed on this part down to 99% coverage as some new codepaths may not be covered by the old test suite.
 
 ## Test results
 
-Overall results with link to a copy or excerpt of the logs (before/after
-refactoring).
+The test results can be seen under the test-logs folder on this main branch.
 
 ## UML class diagram and its description
 !["Original"](img/new_old.png)
