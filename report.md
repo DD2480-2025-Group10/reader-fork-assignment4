@@ -93,9 +93,6 @@ The HTTP layer is built around the requests library and relies on a custom Sessi
 The main change between the two versions is the replacement of the requests-based HTTP layer with an httpx-based implementation, which simplifies the architecture and removes the custom SessionWrapper. In the old version, SessionWrapper wrapped requests.Session, handled caching, executed request and response hooks, and implemented retry logic such as the UA fallback through a response hook registered in SessionFactory. In the new version, httpx.Client is used directly, caching logic is handled inside HTTPRetriever, hooks are implemented using httpx event hooks, and the UA fallback mechanism is refactored into a UAFallbackAuth class that uses httpx’s Auth interface and its auth_flow retry mechanism. 
 
 
-The main change between the two versions is the replacement of the requests-based HTTP layer with an httpx-based implementation, which simplifies the architecture and removes the custom SessionWrapper. In the old version, SessionWrapper wrapped requests.Session, handled caching, executed request and response hooks, and implemented retry logic such as the UA fallback through a response hook registered in SessionFactory. In the new version, httpx.Client is used directly, caching logic is handled inside HTTPRetriever, hooks are implemented using httpx event hooks, and the UA fallback mechanism is refactored into a UAFallbackAuth class that uses httpx’s Auth interface and its auth_flow retry mechanism. 
-
-
 ### Key changes/classes affected
 
 Optional (point 1): Architectural overview.
