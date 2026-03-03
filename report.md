@@ -87,7 +87,14 @@ The test results can be seen under the test-logs folder on this main branch.
 
 ## UML class diagram and its description
 !["Original"](img/new_old.png)
-In the original implementation, the reader parser relied on the requests library for all network operations. The SessionFactory was responsible for configuring a requests.Session with basic timeouts and headers. Any advanced logic, such as the ua_fallback plugin, was injected via global response hooks. This architecture was simple but lacked the flexibility to swap the underlying engine without breaking the expectations of the calling code, which depended on specific requests attributes like string-based URLs and specific exception types
+The HTTP layer is built around the requests library and relies on a custom SessionWrapper to extend and control its behavior. SessionFactory creates SessionWrapper instances, which wraps a requests.Session and were responsible for handling timeouts, applying request and response hooks, managing caching headers through caching_get(), and implementing retry logic such as the UA fallback. The UA fallback itself was implemented as a response hook registered in SessionFactory. 
+!["new version"](img/new_ver.png)
+
+The main change between the two versions is the replacement of the requests-based HTTP layer with an httpx-based implementation, which simplifies the architecture and removes the custom SessionWrapper. In the old version, SessionWrapper wrapped requests.Session, handled caching, executed request and response hooks, and implemented retry logic such as the UA fallback through a response hook registered in SessionFactory. In the new version, httpx.Client is used directly, caching logic is handled inside HTTPRetriever, hooks are implemented using httpx event hooks, and the UA fallback mechanism is refactored into a UAFallbackAuth class that uses httpx’s Auth interface and its auth_flow retry mechanism. 
+
+
+The main change between the two versions is the replacement of the requests-based HTTP layer with an httpx-based implementation, which simplifies the architecture and removes the custom SessionWrapper. In the old version, SessionWrapper wrapped requests.Session, handled caching, executed request and response hooks, and implemented retry logic such as the UA fallback through a response hook registered in SessionFactory. In the new version, httpx.Client is used directly, caching logic is handled inside HTTPRetriever, hooks are implemented using httpx event hooks, and the UA fallback mechanism is refactored into a UAFallbackAuth class that uses httpx’s Auth interface and its auth_flow retry mechanism. 
+
 
 ### Key changes/classes affected
 
