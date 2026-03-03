@@ -27,11 +27,11 @@ For each team member, how much time (**in hours**) was spent in:
 | Tasks | Villiam | William | Erik | Alrik | Boyan |
 |------|---------|---------|------|-------|-------|
 | 1. Plenary discussions/meetings | 5 | 5 | 5 | 5 | 5 |
-| 2. Discussions within parts of the group | 5 | 3 | E5| 3 | 5 |
+| 2. Discussions within parts of the group | 5 | 5 | 5 | 3 | 5 |
 | 3. Reading documentation | 1 | 1 | 4 | 2 | 1 |
 | 4. Configuration and setup | 1 | 0.5 | 3 | 0.5 | 1 |
 | 5. Analyzing code/output | 10 | 4 | 5 | 5| 8 |
-| 6. Writing documentation | 2 | 3 | 5 | 2| 1 |
+| 6. Writing documentation | 2 | 4 | 5 | 2| 1 |
 | 7. Writing code | 5 | 3 | 5 | 5 | 10 |
 | 8. Running code | 3 | 2 | 2 | 3 | 2 |
 
@@ -70,7 +70,7 @@ The following was our working requirements formulated from the original issue:
   - [x] (2.1.0) Refactor SessionFactory to use httpx.Client with native timeout and event_hooks.
   - [x] (2.2.0)Adapt ua_fallback plugin to use httpx response hook signature.
 - [x] (3.0.0) Interface must be backwards compatible. We are swapping out the implementation details of [requests](https://pypi.org/project/requests/) everything must work the same from the outside.
-- [x] (4.0.0) Wire implementation into the public interface **(HOW? tbd)**
+- [x] (4.0.0) Wire implementation into the public interface
 
 ## Code changes
 
@@ -93,13 +93,8 @@ The HTTP layer is built around the requests library and relies on a custom Sessi
 The main change between the two versions is the replacement of the requests-based HTTP layer with an httpx-based implementation, which simplifies the architecture and removes the custom SessionWrapper. In the old version, SessionWrapper wrapped requests.Session, handled caching, executed request and response hooks, and implemented retry logic such as the UA fallback through a response hook registered in SessionFactory. In the new version, httpx.Client is used directly, caching logic is handled inside HTTPRetriever, hooks are implemented using httpx event hooks, and the UA fallback mechanism is refactored into a UAFallbackAuth class that uses httpx’s Auth interface and its auth_flow retry mechanism. 
 
 
-### Key changes/classes affected
 
-Optional (point 1): Architectural overview.
-
-Optional (point 2): relation to design pattern(s).
-
-## Way of working (NOT DONE)
+## Way of working
 
 ### Principles Established
 
@@ -159,8 +154,12 @@ The whole team is involved in the inspection and adaptation of the way-of-workin
 Based on the checklist in the Essence Standard v1.2, we assess our work as being in the In Place state, having hit 2 milestones in the in place phase. We had some issues with using the same tools in this lab, but in the end we managed to sort it out. Almost all practices and tools are being used by the whole team.
 
 
-## Overall experience (NOT DONE)
+## Overall experience
 
-What are your main take-aways from this project? What did you learn?
+Our main take-aways from this project are that picking the most suitable project matters a lot, and that
+understanding someone else's code is difficult. A majority of the time was spent on analyzing the code to
+understand it rather than writing new code. Choosing a project with the right scope for this assignment
+made a big difference and choosing `reader` over `mypy` or ``poke-env` was approachable while still remaining
+complex enough to fit the project and be interesting.
 
-How did you grow as a team, using the Essence standard to evaluate yourself?
+In terms of team growth, we assess ourselves as having reached the In Place state in the Essence standard, with clearer ownership of different parts of the work compared to previous assignments, though not all practices were consistently followed by everyone.
